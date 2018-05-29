@@ -11,30 +11,36 @@ double l0 = 0, locc = 0.4, lfree = -0.4;
 double gridWidth = 100, gridHeight = 100;
 // Map dimensions
 double mapWidth = 30000, mapHeight = 15000;
-// Robot size with respect to the map 
+// Robot size with respect to the map
 double robotXOffset = mapWidth / 5, robotYOffset = mapHeight / 3;
 // Defining an l vector to store the log odds values of each cell
 vector< vector<double> > l(mapWidth/gridWidth, vector<double>(mapHeight/gridHeight));
 
 double inverseSensorModel(double x, double y, double theta, double xi, double yi, double sensorData[])
 {
-    // You will be coding this section in the upcoming concept! 
+    // You will be coding this section in the upcoming concept!
     return 0.4;
 }
 
 void occupancyGridMapping(double Robotx, double Roboty, double Robottheta, double sensorData[])
 {
     //1 - Generate a grid (size 300x150) and then loop through all the cells
-            //2-  Compute the center of mass of each cell xi and yi 
-            //double xi = x * gridWidth + gridWidth / 2 - robotXOffset;
-            //double yi = -(y * gridHeight + gridHeight / 2) + robotYOffset;
+    for (int x = 0; x < mapWidth / gridWidth; x++){
+        for (int y = 0; y < mapHeight / gridHeight; y++){
+            //2-  Compute the center of mass of each cell xi and yi
+            double xi = x * gridWidth + gridWidth / 2 - robotXOffset;
+            double yi = -(y * gridHeight + gridHeight / 2) + robotYOffset;
             //3- Check if each cell falls under the perceptual field of the measurements
-    
-    
-    
-    
-    
-    
+            // if the distance between the cell centroid and the robot pose is smaller or equal than the maximum measurements Zmax
+            if (sqrt(pow((xi - Robotx),2) + pow((yi - Roboty),2)) <= Zmax){
+                l[x][y] = l[x][y] + inverseSensorModel(Robotx, Roboty, Robottheta, xi, yi, sensorData) - l0;
+            }
+        }
+    }
+
+
+
+
 }
 
 int main()
@@ -43,8 +49,8 @@ int main()
     double measurementData[8];
     double robotX, robotY, robotTheta;
 
-    FILE* posesFile = fopen("poses.txt", "r");
-    FILE* measurementFile = fopen("measurement.txt", "r");
+    FILE* posesFile = fopen("../data/poses.txt", "r");
+    FILE* measurementFile = fopen("../data/measurement.txt", "r");
 
     // Scanning the files and retrieving measurement and poses at each timestamp
     while (fscanf(posesFile, "%lf %lf %lf %lf", &timeStamp, &robotX, &robotY, &robotTheta) != EOF) {
@@ -54,14 +60,13 @@ int main()
         }
         occupancyGridMapping(robotX, robotY, (robotTheta / 10) * (M_PI / 180), measurementData);
     }
-    
+
     // Displaying the map
     for (int x = 0; x < mapWidth / gridWidth; x++) {
         for (int y = 0; y < mapHeight / gridHeight; y++) {
             cout << l[x][y] << " ";
         }
     }
-    
+
     return 0;
 }
-
