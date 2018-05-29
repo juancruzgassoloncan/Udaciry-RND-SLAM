@@ -25,7 +25,8 @@ double inverseSensorModel(double x, double y, double theta, double xi, double yi
     double alpha = 200, beta = 20;
 
     //******************Compute r and phi**********************//
-
+    double r = sqrt(pow(xi - x,2) + pow(yi - y,2));
+    double phi = atan2((yi - y),(xi - x)) - theta;
 
     //Scaling Measurement to [-90 -37.5 -22.5 -7.5 7.5 22.5 37.5 90]
     for (int i = 0; i < 8; i++) {
@@ -54,12 +55,17 @@ double inverseSensorModel(double x, double y, double theta, double xi, double yi
 
     //******************Evaluate the three cases**********************//
     // You also have to consider the cells with Zk > Zmax or Zk < Zmin as unkown states
-
-
-
-
-
+    if (r > min((double)Zmax,Zk + alpha / 2.0) || fabs(phi - thetaK) > beta / 2.0 || Zk > Zmax || Zk < Zmin){
+        return l0;
+    }
+    else if (Zk < Zmax && fabs(r - Zk) < alpha / 2.0){
+        return locc;
+    }
+    else if (r <= Zk){
+        return lfree;
+    }
 }
+
 
 void occupancyGridMapping(double Robotx, double Roboty, double Robottheta, double sensorData[])
 {
@@ -80,8 +86,8 @@ int main()
     double measurementData[8];
     double robotX, robotY, robotTheta;
 
-    FILE* posesFile = fopen("poses.txt", "r");
-    FILE* measurementFile = fopen("measurement.txt", "r");
+    FILE* posesFile = fopen("../data/poses.txt", "r");
+    FILE* measurementFile = fopen("../data/measurement.txt", "r");
 
     // Scanning the files and retrieving measurement and poses at each timestamp
     while (fscanf(posesFile, "%lf %lf %lf %lf", &timeStamp, &robotX, &robotY, &robotTheta) != EOF) {
