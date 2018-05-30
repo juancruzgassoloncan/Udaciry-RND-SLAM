@@ -76,14 +76,42 @@ void occupancyGridMapping(double Robotx, double Roboty, double Robottheta, doubl
     }
 }
 
+/*
+Set Title: plt::title("Your Title");
+Set Limits: plt::xlim(x-axis lower limit, x-axis upper limit );
+Plot Data:plt::plot({ x-value }, { y-value }, "Color and Shape");
+Save Plot: plt::save("File name and directory");
+Close Plot: plt::clf();
+*/
 void visualization()
 {
     //Initialize a plot named Map of size 300x150
-    
-    //Loop over the log odds values of the cells and plot each cell state. 
-    //Unkown state: green color, occupied state: black color, and free state: red color 
-    
-    //Save the image and close the plot 
+    //Graph Format
+    plt::title("Map");
+    plt::xlim(0, (int)(mapWidth / gridWidth));
+    plt::ylim(0, (int)(mapHeight / gridHeight));
+
+    //Loop over the log odds values of the cells and plot each cell state.
+    //Unkown state: green color, occupied state: black color, and free state: red color
+
+    for (double x = 0; x < (mapWidth / gridWidth); x++) {
+        for (double y = 0; y < (mapHeight / gridHeight); y++) {
+            if (l[x][y] == 0){ //unknown
+                plt::plot({x},{y},"g.");
+            }
+            else if (l[x][y] > 0){ //occupied
+                plt::plot({x},{y},"k.");
+            }
+            else { //free
+                plt::plot({x},{y},"r.");
+            }
+        }
+    }
+	//Save the image and close the plot
+    plt::save("./Images/myMap.png");
+    plt::clf();
+
+    //Save the image and close the plot
 }
 
 int main()
@@ -111,4 +139,3 @@ int main()
 
     return 0;
 }
-
