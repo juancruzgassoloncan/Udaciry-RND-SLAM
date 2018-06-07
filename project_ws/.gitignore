@@ -1,0 +1,7 @@
+/build/
+/devel/
+*.pdf
+*.gv
+*.workspace
+*.workspace.user
+*.db
